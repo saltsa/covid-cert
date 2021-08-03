@@ -11,15 +11,16 @@
 			WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
 				inst = result.instance;
 				mod = result.module;
-				// go.run(result.instance);
-				document.getElementById("runButton").disabled = false;
 				run();
 			});
 
 			async function run() {
 				document.getElementById("runButton").disabled = true;
+				document.getElementById("runButton").innerText = "App running";
 				await go.run(inst);
-				console.log("run complete, reset instance")
+				document.getElementById("runButton").disabled = false;
+				document.getElementById("runButton").innerText = "Run complete, Run";
+
 				inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
 				console.log("reset complete")
 			}
@@ -28,7 +29,7 @@
 	<body>
 		<div id="qr-reader" style="width: 600px"></div>
 		<div id="response"></div>
-		<button onClick="run();" id="runButton" disabled>Run Go</button>
+		<button onClick="run();" id="runButton" disabled>Run</button>
 
 		<script>
 			function onScanSuccess(decodedText, decodedResult) {
@@ -38,7 +39,6 @@
 				let out = "";
 				const keys = Object.keys(response);
 				keys.sort();
-				console.log("keys:", keys)
 				for (const key of keys) {
 					out += `${key}: ${response[key]}\n`;
 				}

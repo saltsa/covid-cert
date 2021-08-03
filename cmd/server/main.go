@@ -14,5 +14,6 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir(`.`)))
 	logHandler := handlers.LoggingHandler(os.Stdout, http.DefaultServeMux)
-	http.ListenAndServe(port, logHandler)
+
+	http.ListenAndServeTLS(port, "cert.pem", "key.pem", logHandler)
 }
