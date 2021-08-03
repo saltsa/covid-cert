@@ -1,0 +1,61 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<script src="wasm_exec.js"></script>
+		<script src="html5-qrcode.min.js"></script>
+
+		<script>
+			const go = new Go();
+			let mod, inst;
+
+			WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+				inst = result.instance;
+				mod = result.module;
+				// go.run(result.instance);
+				document.getElementById("runButton").disabled = false;
+				run();
+			});
+
+			async function run() {
+				document.getElementById("runButton").disabled = true;
+				await go.run(inst);
+				console.log("run complete, reset instance")
+				inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
+				console.log("reset complete")
+			}
+		</script>
+	</head>
+	<body>
+		<div id="qr-reader" style="width: 600px"></div>
+		<div id="response"></div>
+		<button onClick="run();" id="runButton" disabled>Run Go</button>
+
+		<script>
+			function onScanSuccess(decodedText, decodedResult) {
+				console.log(`Code scanned`);
+				let response = goVerify(decodedText);
+				
+				let out = "";
+				const keys = Object.keys(response);
+				keys.sort();
+				console.log("keys:", keys)
+				for (const key of keys) {
+					out += `${key}: ${response[key]}\n`;
+				}
+				document.getElementById("response").innerText = out;
+			}
+			let html5QrcodeScanner = new Html5QrcodeScanner("qr-reader",
+				{
+					fps: 10,
+					qrbox: 250,
+					formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ],
+					experimentalFeatures: {
+        				useBarCodeDetectorIfSupported: true,
+    				},
+				}
+				
+			);
+			html5QrcodeScanner.render(onScanSuccess);
+		</script>
+	</body>
+</html>
