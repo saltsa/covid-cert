@@ -26,5 +26,5 @@ Application is available at `https://localhost:8080`
 
 Command line version expects the QR code data to be in file called `data.txt`.
 ```
-go build && ./covid-cert
+./run_local.sh
 ```

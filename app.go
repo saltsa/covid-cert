@@ -150,6 +150,10 @@ func getPK() (*ecdsa.PublicKey, error) {
 
 func doValidation(data []byte) map[string]interface{} {
 
+	start := time.Now()
+	defer func() {
+		log.Printf("parsing and validation process took %s", time.Since(start))
+	}()
 	cborData, err := openData(data)
 	if err != nil {
 		log.Errorf("failed to read data: %s", err)
