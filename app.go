@@ -56,6 +56,8 @@ type signedCWT struct {
 
 const finnishPK = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEepKcLfnTZIej9gSNJVmR8sRYMMgztnG9h0ZGWx7D1X1g32V/GtJc55HkoH+vqkbkhKJnvDBJ1JdsbkKKmBJb2Q"
 
+// parseCbor returns CWT (from which Signature is used) and commonPayload
+// which includes issuer and certificate
 func parseCbor(data []byte) (*signedCWT, *commonPayload, error) {
 
 	var cwt signedCWT
@@ -86,7 +88,14 @@ func readData() ([]byte, error) {
 	log.Println("reading data.txt...")
 	return ioutil.ReadFile("data.txt")
 }
+
+// openData decodes base64 input and then decompresses zlib data returning it
 func openData(data []byte) ([]byte, error) {
+
+	if !bytes.HasPrefix(data, []byte("HC1:")) {
+		return nil, errors.New(`invalid data, should start with "HC1:"`)
+	}
+
 	// skip prefix "HC1:"
 	data = data[4:]
 
@@ -102,13 +111,13 @@ func openData(data []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	uncompressed := bytes.NewBuffer(make([]byte, 0))
-	_, err = io.Copy(uncompressed, r)
+	decompressed := bytes.NewBuffer(make([]byte, 0))
+	_, err = io.Copy(decompressed, r)
 	if err != nil {
 		return nil, err
 	}
 
-	return uncompressed.Bytes(), nil
+	return decompressed.Bytes(), nil
 }
 
 // verify return nil if verify is success
@@ -136,6 +145,9 @@ func verify(data []byte, signature []byte) error {
 	return nil
 }
 
+// getPK gets and returns PublicKey from constant.
+// TODO: Support multiple pubkeys and read them from file or directly
+// from the API
 func getPK() (*ecdsa.PublicKey, error) {
 	fpk, err := base64.RawStdEncoding.DecodeString(finnishPK)
 	if err != nil {
@@ -148,6 +160,10 @@ func getPK() (*ecdsa.PublicKey, error) {
 	return key.(*ecdsa.PublicKey), nil
 }
 
+// doValidation decodes and parse cbor and validates signature
+// It also validates vaccination date and health certificate expiration
+// Returns string-interface map which can be feed to javascript. All values
+// in the map shall be strings.
 func doValidation(data []byte) map[string]interface{} {
 
 	start := time.Now()
