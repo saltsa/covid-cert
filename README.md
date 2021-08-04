@@ -38,3 +38,9 @@ To run Go compiled code directly:
 ```
 ./covid-cert
 ```
+
+## TODO
+
+Support multiple countries. Get public keys from:
+* https://verifier-api.coronacheck.nl/v4/verifier/public_keys (EU)
+* https://covid-status.service.nhsx.nhs.uk/pubkeys/keys.json (UK)
