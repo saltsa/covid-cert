@@ -8,6 +8,10 @@ import (
 	"github.com/gorilla/handlers"
 )
 
+const (
+	dir = "./static"
+)
+
 func main() {
 	port := `:8080`
 	if envPort := os.Getenv("PORT"); envPort != "" {
@@ -15,7 +19,7 @@ func main() {
 	}
 	log.Printf("listening on %s", port)
 
-	http.Handle("/", http.FileServer(http.Dir(`.`)))
+	http.Handle("/", http.FileServer(http.Dir(dir)))
 	logHandler := handlers.LoggingHandler(os.Stdout, http.DefaultServeMux)
 
 	http.ListenAndServeTLS(port, "cert.pem", "key.pem", logHandler)

@@ -19,7 +19,7 @@
 				document.getElementById("runButton").innerText = "App running";
 				await go.run(inst);
 				document.getElementById("runButton").disabled = false;
-				document.getElementById("runButton").innerText = "Run complete, Run";
+				document.getElementById("runButton").innerText = "Run complete, Run again";
 
 				inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
 				console.log("reset complete")
@@ -29,7 +29,7 @@
 	<body>
 		<div id="qr-reader" style="width: 600px"></div>
 		<div id="response"></div>
-		<button onClick="run();" id="runButton" disabled>Run</button>
+		<button onClick="run();" id="runButton" disabled>App not running</button>
 
 		<script>
 			function onScanSuccess(decodedText, decodedResult) {
