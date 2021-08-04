@@ -19,7 +19,7 @@ Compile:
 
 ## Running
 
-Run the serving http server which serves application to browser:
+Run the serving http server which serves application to browser from `static` directory:
 
 ```
 ./http-server
@@ -30,6 +30,7 @@ Application is available at `https://localhost:8080`.
 To run Webassembly version with NodeJS:
 
 ```
+cd static
 node wasm_exec.js main.wasm
 ```
 
