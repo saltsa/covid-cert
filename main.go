@@ -6,6 +6,16 @@ import (
 
 func main() {
 
+	keys, err := getFileKeys()
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = parseKeys(keys)
+	if err != nil {
+		log.Println(err)
+	}
+
 	callbacksRegistered := registerCallbacks()
 
 	data, err := readData()

@@ -46,6 +46,11 @@ type vacInfo struct {
 	Identifier        string `json:"ci"`
 }
 
+type cwtHeader struct {
+	Algorithm     int    `cbor:"1,keyasint"`
+	KeyIdentifier []byte `cbor:"4,keyasint"`
+}
+
 type signedCWT struct {
 	_           struct{} `cbor:",toarray"`
 	Protected   []byte
@@ -54,7 +59,7 @@ type signedCWT struct {
 	Signature   []byte
 }
 
-const finnishPK = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEepKcLfnTZIej9gSNJVmR8sRYMMgztnG9h0ZGWx7D1X1g32V/GtJc55HkoH+vqkbkhKJnvDBJ1JdsbkKKmBJb2Q"
+const finnishPK = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEepKcLfnTZIej9gSNJVmR8sRYMMgztnG9h0ZGWx7D1X1g32V/GtJc55HkoH+vqkbkhKJnvDBJ1JdsbkKKmBJb2Q=="
 
 // parseCbor returns CWT (from which Signature is used) and commonPayload
 // which includes issuer and certificate
@@ -84,6 +89,16 @@ func parseCbor(data []byte) (*signedCWT, *commonPayload, error) {
 
 	return &cwt, &cp, nil
 }
+
+func getKID(header []byte) (string, error) {
+	var cheader cwtHeader
+	err := cbor.Unmarshal(header, &cheader)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(cheader.KeyIdentifier), nil
+}
+
 func readData() ([]byte, error) {
 	log.Println("reading data.txt...")
 	return ioutil.ReadFile("data.txt")
@@ -121,8 +136,8 @@ func openData(data []byte) ([]byte, error) {
 }
 
 // verify return nil if verify is success
-func verify(data []byte, signature []byte) error {
-	pk, err := getPK()
+func verify(data []byte, signature []byte, kid string) error {
+	pk, err := getPK(kid)
 	if err != nil {
 		return err
 	}
@@ -148,8 +163,12 @@ func verify(data []byte, signature []byte) error {
 // getPK gets and returns PublicKey from constant.
 // TODO: Support multiple pubkeys and read them from file or directly
 // from the API
-func getPK() (*ecdsa.PublicKey, error) {
-	fpk, err := base64.RawStdEncoding.DecodeString(finnishPK)
+func getPK(kid string) (*ecdsa.PublicKey, error) {
+	pk, ok := publicKeys[kid]
+	if !ok {
+		return nil, fmt.Errorf("no public key found with key id %s", kid)
+	}
+	fpk, err := base64.StdEncoding.DecodeString(pk)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +201,13 @@ func doValidation(data []byte) map[string]interface{} {
 		return nil
 	}
 
-	err = verify(cborData, cwt.Signature)
+	kid, err := getKID(cwt.Protected)
+	if err != nil {
+		log.Errorf("failed to get KID from header: %s", err)
+		return nil
+	}
+
+	err = verify(cborData, cwt.Signature, kid)
 	if err != nil {
 		log.Errorf("signature verification failed: %s", err)
 		return nil
@@ -211,8 +236,4 @@ func doValidation(data []byte) map[string]interface{} {
 		"valid":      strings.Join(validStrs, ", "),
 	}
 
-}
-
-func init() {
-	log.SetLevel(log.DebugLevel)
 }

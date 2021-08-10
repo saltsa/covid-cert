@@ -29,20 +29,16 @@
 	<body>
 		<div id="qr-reader" style="width: 600px"></div>
 		<div id="response"></div>
-		<button onClick="run();" id="runButton" disabled>App not running</button>
+		<button onClick="run();" id="runButton">App not running</button>
 
 		<script>
 			function onScanSuccess(decodedText, decodedResult) {
 				console.log(`Code scanned`);
 				let response = goVerify(decodedText);
 				
-				let out = "";
 				const keys = Object.keys(response);
 				keys.sort();
-				for (const key of keys) {
-					out += `${key}: ${response[key]}\n`;
-				}
-				document.getElementById("response").innerText = out;
+				document.getElementById("response").innerText = keys.map(key => `${key}: ${response[key]}`).join("\n");
 			}
 			let html5QrcodeScanner = new Html5QrcodeScanner("qr-reader",
 				{

@@ -1,14 +1,16 @@
-# EU certificate verification in browser
+# EU health certificate verification in browser
 
 Application uses browser Camera or Barcode API to take a picture. This version only supports
 Certificates signed by "The Social Insurance Institution of Finland" public key.
 
 ## Installation
 
-As the Javascript uses Camera API, it needs TLS. Generate certs:
+As the Javascript uses Camera API, it needs TLS. Generate certs. ALso, fetch list of public keys
+used for verification.
 
 ```
 go run $(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost -ecdsa-curve P256
+curl -o list_of_keys.json https://verifier-api.coronacheck.nl/v4/verifier/public_keys
 ```
 
 Compile:
@@ -27,6 +29,9 @@ Run the serving http server which serves application to browser from `static` di
 
 Application is available at `https://localhost:8080`.
 
+The following command line versions require file called `data.txt` which should include the
+QR code data (starting with "HC1:" string).
+
 To run Webassembly version with NodeJS:
 
 ```
@@ -40,7 +45,7 @@ To run Go compiled code directly:
 ./covid-cert
 ```
 
-## TODO
+## Public key list
 
 Support multiple countries. Get public keys from:
 * https://verifier-api.coronacheck.nl/v4/verifier/public_keys (EU)
