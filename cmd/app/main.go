@@ -1,9 +1,8 @@
 package main
 
 import (
+	cvcert "github.com/saltsa/covid-cert"
 	log "github.com/sirupsen/logrus"
-  	"github.com/saltsa/covid-cert"
-
 )
 
 func main() {
@@ -33,6 +32,10 @@ func main() {
 	for key, val := range ret {
 		log.Printf("%s: %s\n", key, val)
 	}
+}
+
+func init() {
+	// log.SetLevel(log.DebugLevel)
 }
 
 // mainLoop just waits for channel close (which never happens). Actions are triggered

@@ -46,6 +46,15 @@ type vacInfo struct {
 	Identifier        string `json:"ci"`
 }
 
+func (v *vacInfo) VaccinationDate() (time.Time, error) {
+	date, err := time.Parse(isoDate, v.DateOfVaccination)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return date, nil
+}
+
 type cwtHeader struct {
 	Algorithm     int    `cbor:"1,keyasint"`
 	KeyIdentifier []byte `cbor:"4,keyasint"`
@@ -59,6 +68,10 @@ type signedCWT struct {
 	Signature   []byte
 }
 
+const daysSinceVaccination = 14
+const isoDate = "2006-01-02"
+
+// not used anymore as we support all EU countries
 const finnishPK = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEepKcLfnTZIej9gSNJVmR8sRYMMgztnG9h0ZGWx7D1X1g32V/GtJc55HkoH+vqkbkhKJnvDBJ1JdsbkKKmBJb2Q=="
 
 // parseCbor returns CWT (from which Signature is used) and commonPayload
@@ -220,12 +233,22 @@ func DoValidation(data []byte) map[string]interface{} {
 
 	validStrs := []string{"certificate is trusted"}
 
+	// 1. ensure cert not expired
 	if time.Now().After(expiry) {
 		validStrs = append(validStrs, "certificate is expired")
 	}
+	// 2. ensure enough doses
 	if vac.DoseNumber < vac.TotalDoses {
 		validStrs = append(validStrs, "not enough doses")
 	}
+	// 3. ensure at least 14 days since last dose
+	vacDate, err := vac.VaccinationDate()
+	if err != nil {
+		validStrs = append(validStrs, "failed to parse vaccination date")
+	} else if vacDate.AddDate(0, 0, daysSinceVaccination).Before(time.Now()) {
+		validStrs = append(validStrs, "not enough days since last dose")
+	}
+
 	return map[string]interface{}{
 		"name":       cp.Cert[1].Name["gn"] + " " + cp.Cert[1].Name["fn"],
 		"doses":      fmt.Sprintf("%d / %d", vac.DoseNumber, vac.TotalDoses),
