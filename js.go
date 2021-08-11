@@ -1,6 +1,6 @@
 // +build js,wasm
 
-package main
+package cvcert
 
 import (
 	"syscall/js"
@@ -17,7 +17,7 @@ func verifyJSData(this js.Value, args []js.Value) interface{} {
 		log.Info("args len is zero")
 		return false
 	}
-	res := doValidation([]byte(args[0].String()))
+	res := DoValidation([]byte(args[0].String()))
 	log.Infof("output: %v", res)
 	if res == nil {
 		return map[string]interface{}{
@@ -27,7 +27,7 @@ func verifyJSData(this js.Value, args []js.Value) interface{} {
 	return res
 }
 
-func registerCallbacks() bool {
+func RegisterCallbacks() bool {
 	js.Global().Set("goVerify", js.FuncOf(verifyJSData))
 	return true
 }

@@ -1,4 +1,4 @@
-module covid-cert
+module github.com/saltsa/covid-cert
 
 go 1.16
 

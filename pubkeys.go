@@ -1,4 +1,4 @@
-package main
+package cvcert
 
 import (
 	"bytes"
@@ -53,7 +53,7 @@ func getHTTPKeys() (io.Reader, error) {
 }
 
 // getFileKeys reads embedded list of keys
-func getFileKeys() (io.Reader, error) {
+func GetFileKeys() (io.Reader, error) {
 
 	f, err := embedFS.Open("list_of_keys.json")
 	if err != nil {
@@ -69,7 +69,7 @@ func getFileKeys() (io.Reader, error) {
 	return buf, nil
 }
 
-func parseKeys(body io.Reader) error {
+func ParseKeys(body io.Reader) error {
 
 	// first parse the http response
 	dec := json.NewDecoder(body)

@@ -1,7 +1,7 @@
 // +build !js,!wasm
 
-package main
+package cvcert
 
-func registerCallbacks() bool {
+func RegisterCallbacks() bool {
 	return false
 }

@@ -2,23 +2,25 @@ package main
 
 import (
 	log "github.com/sirupsen/logrus"
+  	"github.com/saltsa/covid-cert"
+
 )
 
 func main() {
 
-	keys, err := getFileKeys()
+	keys, err := cvcert.GetFileKeys()
 	if err != nil {
 		log.Println(err)
 	}
 
-	err = parseKeys(keys)
+	err = cvcert.ParseKeys(keys)
 	if err != nil {
 		log.Println(err)
 	}
 
-	callbacksRegistered := registerCallbacks()
+	callbacksRegistered := cvcert.RegisterCallbacks()
 
-	data, err := readData()
+	data, err := cvcert.ReadData()
 	if err != nil {
 		if callbacksRegistered {
 			log.Infof("reading data failed (%s), but JS callbacks registered. Entering event loop.", err)
@@ -26,7 +28,7 @@ func main() {
 		}
 		log.Fatalf("reading data failed: %s", err)
 	}
-	ret := doValidation(data)
+	ret := cvcert.DoValidation(data)
 
 	for key, val := range ret {
 		log.Printf("%s: %s\n", key, val)

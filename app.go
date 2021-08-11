@@ -1,4 +1,4 @@
-package main
+package cvcert
 
 import (
 	"bytes"
@@ -99,7 +99,7 @@ func getKID(header []byte) (string, error) {
 	return base64.StdEncoding.EncodeToString(cheader.KeyIdentifier), nil
 }
 
-func readData() ([]byte, error) {
+func ReadData() ([]byte, error) {
 	log.Println("reading data.txt...")
 	return ioutil.ReadFile("data.txt")
 }
@@ -183,7 +183,7 @@ func getPK(kid string) (*ecdsa.PublicKey, error) {
 // It also validates vaccination date and health certificate expiration
 // Returns string-interface map which can be feed to javascript. All values
 // in the map shall be strings.
-func doValidation(data []byte) map[string]interface{} {
+func DoValidation(data []byte) map[string]interface{} {
 
 	start := time.Now()
 	defer func() {
