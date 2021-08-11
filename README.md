@@ -3,7 +3,9 @@
 Application uses browser Camera or Barcode API to take a picture. This version only supports
 Certificates signed by "The Social Insurance Institution of Finland" public key.
 
-## Installation
+## Compiling
+
+This app requires Go, install in on macOS by running `brew install go`.
 
 As the Javascript uses Camera API, it needs TLS. Generate certs. Also, fetch the list of public keys
 used for verification.
