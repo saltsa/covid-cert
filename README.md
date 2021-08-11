@@ -1,11 +1,11 @@
-# EU health certificate verification in browser
+# EU health certificate (Covid-19 passport) verification in browser
 
 Application uses browser Camera or Barcode API to take a picture. This version only supports
 Certificates signed by "The Social Insurance Institution of Finland" public key.
 
 ## Installation
 
-As the Javascript uses Camera API, it needs TLS. Generate certs. ALso, fetch list of public keys
+As the Javascript uses Camera API, it needs TLS. Generate certs. Also, fetch the list of public keys
 used for verification.
 
 ```
@@ -49,4 +49,4 @@ To run Go compiled code directly:
 
 Support multiple countries. Get public keys from:
 * https://verifier-api.coronacheck.nl/v4/verifier/public_keys (EU)
-* https://covid-status.service.nhsx.nhs.uk/pubkeys/keys.json (UK)
+* https://covid-status.service.nhsx.nhs.uk/pubkeys/keys.json (UK, not supported atm)
