@@ -8,11 +8,13 @@ Certificates signed by "The Social Insurance Institution of Finland" public key.
 This app requires Go, install in on macOS by running `brew install go`.
 
 As the Javascript uses Camera API, it needs TLS. Generate certs. Also, fetch the list of public keys
-used for verification.
+used for verification. Third command copies newest version of `wasm_exec.js` to enable web assembly
+usage.
 
 ```
 go run $(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost -ecdsa-curve P256
 curl -o list_of_keys.json https://verifier-api.coronacheck.nl/v4/verifier/public_keys
+cp $(go env GOROOT)/misc/wasm/wasm_exec.js static
 ```
 
 Compile:

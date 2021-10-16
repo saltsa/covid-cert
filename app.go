@@ -245,7 +245,7 @@ func DoValidation(data []byte) map[string]interface{} {
 	vacDate, err := vac.VaccinationDate()
 	if err != nil {
 		validStrs = append(validStrs, "failed to parse vaccination date")
-	} else if vacDate.AddDate(0, 0, daysSinceVaccination).Before(time.Now()) {
+	} else if vacDate.AddDate(0, 0, daysSinceVaccination).After(time.Now()) {
 		validStrs = append(validStrs, "not enough days since last dose")
 	}
 
